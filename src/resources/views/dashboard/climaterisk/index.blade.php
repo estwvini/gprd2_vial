@@ -94,10 +94,10 @@
                                 <button id="execute_btn" class="btn btn-success" disabled>
                                     <i class="fa fa-check"></i> {{ trans('climate_risk.labels.execute') }}
                                 </button>
-                                <button id="generate_btn" class="btn btn-success" disabled>
+                                <!--button id="generate_btn" class="btn btn-success" disabled>
                                     <i class="fa fa-check"></i> {{ trans('climate_risk.labels.export') }}
                                     <a id="image-download" download="map.png"></a>
-                                </button>                                  
+                                </button-->                                  
                             </div>
                         </form>
                     </div>
@@ -173,7 +173,7 @@
                         $("#dpa_dp").val(layer.dpa_dp);    
                     });
                     $('#execute_btn').attr("disabled", false);
-                    $('#generate_btn').attr("disabled", false);
+                    //$('#generate_btn').attr("disabled", false);
                     api_osm.load_layer_risks(layers, $("#layerId").val() + "_" + $('#typeId').val(), $("#dpa_dr").val());                    
                 }
             }).always(() => {

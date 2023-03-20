@@ -111,13 +111,5 @@ ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres'
 
 ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "SDII-medias.geojson" -nln sch_gis.SDII-medias -overwrite
 
-delete from	public.menus where parent_id = 70;
-delete from	public.menus where id = 70 and  module_id = 2;
-delete FROM public.permission_role where permission_id in (31,63);
-delete from public.permissions where module_id = 2 and inherit_id = 14;
-delete from public.permissions where module_id = 2 and id = 14;
 
 
-{"index":{"inner":{"generate":{"allowed":false},"execute":{"allowed":false},"locale":{"allowed":false}},"label":"Lista Vulnerabilidad y riesgo climático","order":1,"allowed":false}}
-
-{"index":{"inner":{"generate":{"allowed":true},"execute":{"allowed":true},"locale":{"allowed":true}},"label":"Lista Vulnerabilidad y riesgo climático","order":1,"allowed":true}}
