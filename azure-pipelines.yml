@@ -1,0 +1,147 @@
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+# no PR trigger
+pr: none
+
+variables:
+  # Azure Resource Manager connection created during pipeline creation
+  azureSubscription: 'f8a54720-affb-4f85-a5e8-7e81c87cbbea'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  resource: 'CONGOPE'
+  cdnEndpoint: 'gprd2'
+
+stages:
+  - stage: Build
+    displayName: Build and Test
+    variables:
+      phpVersion: '8.1'
+    jobs:
+      - job: BuildAndTest
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+
+          - script: |
+              sudo update-alternatives --set php /usr/bin/php$(phpVersion)
+              sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
+              sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+              sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+              sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
+              php -version
+            displayName: 'Use PHP version $(phpVersion)'
+
+          - script: |
+              sudo systemctl start postgresql.service
+              sudo -u postgres psql -c 'create database gprd;'
+            displayName: 'Setup PostgreSQL for Testing'
+
+          - script: |
+              sudo apt-get install -y php$(phpVersion)-curl php$(phpVersion)-xml php$(phpVersion)-mbstring php$(phpVersion)-zip \
+                 php$(phpVersion)-gd php$(phpVersion)-bcmath php$(phpVersion)-sqlite3
+            displayName: 'PHP - Install Extensions'
+
+          - script: composer install --no-interaction --prefer-dist
+            displayName: 'Composer install'
+
+          - script: |
+              cp .env.testing.example .env.testing
+              cp .env.example .env
+            displayName: 'Copy environment file'
+
+          - script: |
+              php artisan key:generate
+            displayName: 'Generate app key'
+
+          #          - script: |
+          #              php artisan test --stop-on-failure
+          #            displayName: 'Executing Tests'
+
+          - script: |
+              npm install && npm run production
+            displayName: 'Install and Build Assets'
+
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: |
+                public/css/**
+                public/images/**
+                public/js/**
+                public/vendor/**
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+  - stage: Docker
+    displayName: Build and Push Docker Image
+    dependsOn: Build
+    jobs:
+      - job: BuildAndPushDockerImage
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'gprd2'
+              repository: 'gprd'
+              command: 'buildAndPush'
+              Dockerfile: 'docker/Dockerfile'
+              buildContext: '.'
+              tags: |
+                $(Build.BuildNumber)
+                latest
+
+  - stage: Deploy
+    displayName: 'Deploy to Web App'
+    dependsOn: Docker
+    condition: succeeded()
+    jobs:
+      - deployment: DeploymentJob
+        pool:
+          vmImage: windows-latest
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+
+                - download: current
+                  displayName: 'Download Assets'
+                  artifact: drop
+
+                - task: AzureFileCopy@5
+                  displayName: 'Upload and Purge Assets CDN'
+                  inputs:
+                    SourcePath: '$(Pipeline.Workspace)/drop/public/*'
+                    azureSubscription: 'Azure Service Connection'
+                    Destination: 'AzureBlob'
+                    storage: 'gprdstorage'
+                    ContainerName: 'assets'
+                    CleanTargetBeforeCopy: true
+
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: 'Azure Service Connection'
+                    scriptType: 'pscore'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: 'az cdn endpoint purge  -g $(resource) -n $(cdnEndpoint) --profile-name $(cdnEndpoint) --content-paths "/*"'
+
+                - task: AzureWebAppContainer@1
+                  displayName: 'Azure Web App on Container Deploy'
+                  inputs:
+                    azureSubscription: 'Azure Service Connection'
+                    appName: 'gprd2'
+                    containers: 'gprd2.azurecr.io/gprd:$(Build.BuildNumber)'

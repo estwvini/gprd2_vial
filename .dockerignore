@@ -1,0 +1,16 @@
+.env
+.env.*
+.DS_Store
+.idea
+.git
+_ide_helper.php
+node_modules
+vendor
+storage/framework/cache/**
+storage/framework/sessions/**
+storage/framework/views/**
+composer.lock
+public/css
+public/images
+public/js
+public/mix-manifest.json

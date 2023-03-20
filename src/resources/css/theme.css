@@ -1,0 +1,192 @@
+body {
+  background: #FFFFFF !important;
+  color: #808285;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* LEFT COL */
+
+.left_col {
+  background-color: #256ba7;
+}
+
+.nav_title {
+  background-color: #256ba7 !important;
+}
+
+.site_title {
+  font-size: 15px;
+}
+
+.nav-sm ul.nav.child_menu {
+  background: #004179;
+}
+
+.nav.child_menu > li > a,
+.nav.side-menu > li > a {
+  color: #fff;
+}
+
+.nav-sm .nav.child_menu li.active,
+.nav-sm .nav.side-menu li.active-sm {
+  border-right: 5px solid #fff;
+}
+
+li.active-sm {
+  background-color: #004179;
+}
+
+.nav.side-menu > li.active > a {
+  background: #004179;
+}
+
+li.active {
+  background: #004179;
+}
+
+.nav.side-menu > li.active,
+.nav.side-menu > li.current-page {
+  border-right: 5px solid #fff;
+}
+
+.nav-md ul.nav.child_menu li:before {
+  background: #fff;
+}
+
+.nav-md ul.nav.child_menu li:after {
+  border-left: 1px solid #fff !important;
+}
+
+.fa-chevron-down {
+  color: #FFFFFF !important;
+}
+
+.sidebar-footer {
+  background: #868686;
+}
+
+.sidebar-footer a {
+  background: #e0e0e0;
+}
+
+.sidebar-footer a:hover {
+  background: #868686;
+}
+
+/* TOP NAV */
+
+.nav_menu {
+  background-color: #e0e0e0;
+}
+
+.dropdown-menu > li > a {
+  color: #808285;
+}
+
+.top_nav .nav .open > a, .top_nav .nav .open > a:focus, .top_nav .nav .open > a:hover, .top_nav .nav > li > a:focus, .top_nav .nav > li > a:hover {
+  background: #bcc9da;
+}
+
+/* CONTENT */
+
+#main_content {
+  background-color: #fff;
+}
+
+.x_content {
+  background-color: #fff;
+}
+
+a {
+  color: #58595B;
+}
+
+ul.panel_toolbox .btn-box-tool {
+  color: #808285 !important;
+}
+
+.breadcrumb > .active {
+  background-color: #fff;
+}
+
+/*DATATABLE COLLAPSED BUTTON */
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
+  width: 20px;
+  height: 20px;
+  background-color: #256ba7;
+  line-height: 20px;
+}
+
+table.dataTable tr.dtrg-group td {
+  background-color: #e0e0e0
+}
+
+table.dataTable tr.dtrg-group.dtrg-level-0 td {
+  font-weight: bold
+}
+
+table.dataTable tr.dtrg-group.dtrg-level-1 td, table.dataTable tr.dtrg-group.dtrg-level-2 td {
+  background-color: #f0f0f0;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-left: 2em;
+  font-size: 0.9em
+}
+
+table.dataTable tr.dtrg-group.dtrg-level-2 td {
+  background-color: #f3f3f3
+}
+
+.confirmation-email-failed {
+  background-color: #F7BFBD !important;
+}
+
+/*TOP PROGRESS BAR */
+
+#nprogress .bar {
+  background: #256ba7;
+}
+
+/* TOP RIGHT LOADING SPINNER */
+
+#nprogress .spinner-icon {
+  border-top-color: #256ba7;
+  border-left-color: #256ba7;
+}
+
+.tooltip-inner {
+  background-color: #3A3A3C !important;
+  /*!important is not necessary if you place custom.css at the end of your css calls. For the purpose of this demo, it seems to be required in SO snippet*/
+  color: #fff;
+}
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: #3A3A3C;
+}
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: #3A3A3C;
+}
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: #3A3A3C;
+}
+
+.tooltip.left .tooltip-arrow {
+  border-left-color: #3A3A3C;
+}
+
+/* Bootbox classes */
+
+.bootbox-modal .modal-body {
+  text-align: center;
+  font-size: 14px;
+}

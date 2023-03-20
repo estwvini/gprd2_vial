@@ -1,0 +1,67 @@
+body {
+    padding: 3em;
+}
+
+.padding-left-10 {
+    padding-left: 10px;
+}
+
+.padding-right-10 {
+    padding-right: 10px;
+}
+
+.black-font {
+    color: black
+}
+
+.gray-background {
+    background: #BABABA;
+}
+
+.gray-background-clear {
+    background: #EBEAEA;
+}
+
+.table {
+    border-collapse: collapse;
+}
+
+.table, td {
+    border: 1px solid black;
+}
+
+h4 {
+    font-size: 11px;
+    font-weight: 100;
+}
+
+h3 {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 100;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.alignright {
+    text-align: right;
+}
+
+.alignleft {
+    text-align: left;
+}
+
+.outer {
+    display: flex;
+    height: 30px;
+}
+
+.page_break {
+    page-break-before: always;
+}
+
+.strong {
+    font-weight: bold;
+}

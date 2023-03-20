@@ -1,0 +1,64 @@
+body {
+  background-color: #eee;
+  height: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modules-background {
+  background-color: #fff;
+  height: 100%;
+  margin: 0 20px 20px;
+  padding: 15px 30px 20px;
+  border-radius: 5px;
+}
+
+.modules-main {
+  padding: 20px 0;
+}
+
+.modules-logout,
+.modules-logout:hover {
+  text-decoration: underline;
+  background: none;
+  border: none;
+  margin: 0;
+}
+.modules-logout:hover {
+  color: #23527c;
+}
+
+.modules-logo {
+  width: 700px;
+  margin: 0 auto;
+}
+
+.d-inline-grid {
+  display: inline-grid;
+}
+
+.clickable-image {
+  cursor: pointer;
+  border: 1px solid #eee;
+  width: 200px;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: rgba(238, 238, 238, 0.5);
+}
+.clickable-image:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  transition: all 500ms ease;
+  border: 1px solid rgba(0,0,0,.1);
+}
+
+.table>tbody>tr>td {
+  border: none;
+}
+
+.table tr:hover td {
+  background: none!important;
+  border: none !important;
+}
