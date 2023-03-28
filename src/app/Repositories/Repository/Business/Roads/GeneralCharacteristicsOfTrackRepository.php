@@ -244,6 +244,7 @@ class GeneralCharacteristicsOfTrackRepository extends Repository
             ->select('parroquia')
             ->groupBy('canton', 'parroquia')
             ->having('canton', '=', $name)
+            ->orderBy('parroquia')
             ->get();
 
         return $query;

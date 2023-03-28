@@ -99,17 +99,17 @@ FROM (
   FROM (SELECT codigo,ecabez,ecuerpo,material,tipo, wkb_geometry 
 		FROM gis.alcantarilla_gj where material = 'METALICA' ) inputs) features;
 
- ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "RX95P-altas.geojson" -nln sch_gis.RX95P-altas -overwrite
+ ogr2ogr -f PostgreSQL PG:"dbname='tenant_2' host='pgsql' port='5432' user='postgres' password='postgres'" "rx95p_altas.geojson" -nln sch_gis.rx95p_altas -overwrite
  
-ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "RX95P-histo.geojson" -nln sch_gis.RX95P-histo -overwrite
+ogr2ogr -f PostgreSQL PG:"dbname='tenant_2' host='pgsql' port='5432' user='postgres' password='postgres'" "rx95p_histo.geojson" -nln sch_gis.rx95p_histo -overwrite
   
-ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "RX95P-medias.geojson" -nln sch_gis.RX95P-medias -overwrite
+ogr2ogr -f PostgreSQL PG:"dbname='tenant_2' host='pgsql' port='5432' user='postgres' password='postgres'" "rx95p_medias.geojson" -nln sch_gis.rx95p_medias -overwrite
 
-ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "SDII-altas.geojson" -nln sch_gis.SDII-altas -overwrite
+ogr2ogr -f PostgreSQL PG:"dbname='tenant_2' host='pgsql' port='5432' user='postgres' password='postgres'" "sdii_altas.geojson" -nln sch_gis.sdii_altas -overwrite
 
-ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "SDII-histo.geojson" -nln sch_gis.SDII-histo -overwrite
+ogr2ogr -f PostgreSQL PG:"dbname='tenant_2' host='pgsql' port='5432' user='postgres' password='postgres'" "sdii_histo.geojson" -nln sch_gis.sdii_histo -overwrite
 
-ogr2ogr -f PostgreSQL PG:"dbname='gprd' host='pgsql' port='5432' user='postgres' password='postgres'" "SDII-medias.geojson" -nln sch_gis.SDII-medias -overwrite
+ogr2ogr -f PostgreSQL PG:"dbname='tenant_2' host='pgsql' port='5432' user='postgres' password='postgres'" "sdii_medias.geojson" -nln sch_gis.sdii_medias -overwrite
 
-
+php artisan make:model "Business\Climatic\Risk"
 

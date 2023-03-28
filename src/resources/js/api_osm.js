@@ -3,7 +3,6 @@ import 'ol/ol.css';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import {Map, View} from 'ol';
 import {OSM, Vector as VectorSource} from 'ol/source.js';
-import SourceStamen from 'ol/source/Stamen';
 import {Group as LayerGroup, Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
 import {Circle} from 'ol/geom.js'
 import GeoJSON from 'ol/format/GeoJSON.js';
@@ -152,7 +151,7 @@ var api_osm = {
 						return new Style({
 							stroke: new Stroke({
 							  color: 'red',
-							  width: 1,
+							  width: 2,
 							}),
 						});									
 					},
@@ -277,98 +276,24 @@ var api_osm = {
 				  });
 			overlayGroup.getLayers().push(layer);	
 		});		
+		var layerR = null;
 		map.getLayers().forEach(layer => {
 		  if (layer.get('title') && layer.get('title').substring(0,5) == 'Query'){
-			  map.removeLayer(layer)
+			 layerR = layer;
 		  }
 		});
-		map.addLayer(overlayGroup);
+		map.removeLayer(layerR);
+		map.addLayer(overlayGroup);	
+		
 		layerSwitcher.renderPanel();
 		//map.getLayers().insertAt(0, vector);
 	},
                                
 	get_map: function () { 
 		return map;
-	},	
+	},		
 	
-	displayClimateRisk: function (x, y, z ) {        	
-
-		var container = document.createElement('div');
-		container.className = "ol-popup";
-		var content = document.createElement('div');
-		var closer = document.createElement('a');
-		closer.href = "#";
-		closer.className = "ol-popup-closer";
-		container.appendChild(closer);
-		container.appendChild(content);
-		var extend = [];
-		
-		
-		const overlay = new Overlay({
-		  element: container,
-		  autoPan: {
-			animation: {
-			  duration: 250,
-			},
-		  },
-		});
-		
-		closer.onclick = function () {
-		  overlay.setPosition(undefined);
-		  closer.blur();
-		  return false;
-		};
-		
-		const view = new View({
-		  center: [x, y],
-		  zoom: z,
-		});
-		
-	    map = new Map({
-		  target: 'osm_map',
-		  layers: [     			  			 
-			   new TileLayer({
-			  	 title: 'OSM',
-			  	 type: 'base',
-			  	 visible: true,
-			  	 source: new OSM(),
-				 opacity: 0.5
-			   })
-		  ],
-		  overlays: [overlay],
-		  view: view,
-		});
-
-		layerSwitcher = new LayerSwitcher({
-		  tipLabel: 'Leyenda',
-		  activationMode: 'click',
-		  startActive: true,
-          groupSelectStyle: 'children'
-		});
-		
-		map.addControl(layerSwitcher);
-		
-		map.on('pointermove', function(evt) {
-			var feature = map.forEachFeatureAtPixel(evt.pixel,
-			function(feature, layer) {
-				map.getTargetElement().style.cursor = '';  				
-				return feature;
-			});
-			if (feature) {
-				if(feature.getGeometry().getType() == 'Point' || feature.getGeometry().getType() == 'MultiLineString')
-				{
-					map.getTargetElement().style.cursor = 'pointer';
-				}
-			}	
-			else
-			{
-				map.getTargetElement().style.cursor = '';  
-			}		
-		});
-
-	},
-	
-	load_layer_risks: function (shapes, groupname, layername) {		
+	load_layer_risks: function (shapes, groupname, layername, zoom) {		
 		const styleCache = {};		
 		const overlayGroup = new LayerGroup({
 			title: groupname.toUpperCase(),
@@ -393,7 +318,8 @@ var api_osm = {
 							let style = styleCache[color];	
 							//console.info());
 							if (!style) {	
-								map.getView().fit(source.getExtent());																
+								map.getView().fit(source.getExtent());	
+								map.getView().setZoom(zoom);	
 								style = new Style({
 									fill: new Fill({color: color}),
 									stroke: new Stroke({
@@ -403,16 +329,32 @@ var api_osm = {
 								styleCache[color] = style;							
 							}													
 							return style;
-					}					
+					},
+					opacity: 0.6		
 			});
 			overlayGroup.getLayers().push(layer);				
 		});		
-		map.getLayers().forEach(layer => {
-		  if (layer.get('title') != 'OSM'){
-			  map.removeLayer(layer)
+		var layerR = null;
+		map.getLayers().forEach(layer => {		
+		  if (layer.get('title') && (layer.get('title').substring(0,4) == 'RX95' || layer.get('title').substring(0,4) == 'SDII')){
+			  layerR = layer;			  
 		  }
 		});
-		map.addLayer(overlayGroup);
+		
+		map.removeLayer(layerR);
+		map.getLayers().insertAt(1, overlayGroup);
+		
+		if(map.getControls().getLength() == 4) //controla que no se agreguen mas veces el mismo control
+		{
+			var element = document.createElement('div');
+			element.className = 'ol-panel-2';
+			element.innerHTML = "<table><caption><b>Leyenda</b></caption><tr><td><div class='legend-gray'/></td><td>Nulo</td></tr><tr><td><div class='legend-cane'/></td><td>Más bajo</td></tr><tr><td><div class='legend-green'/></td><td>Bajo</td></tr><tr><td><div class='legend-yellow'/></td><td>Moderado</td></tr><tr><td><div class='legend-orange'/></td><td>Alto</td></tr><tr><td><div class='legend-red'/></td><td>Más alto</td></tr></table>";
+
+			var controlPanel = new Control({
+				element: element
+			});
+			map.addControl(controlPanel);
+		}	
 		layerSwitcher.renderPanel();
 	},
 	

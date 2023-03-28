@@ -12,7 +12,7 @@
 		@elseif(session()->get('module')->id == \App\Models\System\Module::MODULE_LIBRARY)
             @include('dashboard.library.index')
         @elseif(session()->get('module')->id == \App\Models\System\Module::MODULE_CLIMATERISK)
-            @include('dashboard.climaterisk.index')    
+            @include('dashboard.climaterisk.default_risks')    
         @else           
             @include('default_dashboard')
         @endif

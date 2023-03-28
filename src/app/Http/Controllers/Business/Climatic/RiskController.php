@@ -29,15 +29,33 @@ class RiskController extends Controller
     {
         $this->riskProcess = $riskProcess;
     }
-    /**
-     * Llamada al proceso para ubicar coordenadas
+
+     /**
+     * Mostrar vista de riesgo climático.
      *
-     * @return mixed|string
+     * @return JsonResponse
      */
-    public function locale(Request $request)
+    public function index()
     {
         try {
-            return $this->riskProcess->locale($request->all()['filters']);
+            $response['view'] = view('business.climaterisk.index',
+            $this->riskProcess->indexRisk()
+            )->render();
+        } catch (Throwable $e) {
+            $response = defaultCatchHandler($e);
+        }
+        return response()->json($response);
+    }
+
+     /**
+     * Mostrar vista de consulta en shapes.
+     *
+     * @return JsonResponse
+     */
+    public function shapeQuery(Request $request)
+    {
+        try {
+            return $this->riskProcess->shapeQuery($request->all()['filters']);
         } catch (Throwable $e) {
             return defaultCatchHandler($e);
         }
@@ -72,6 +90,22 @@ class RiskController extends Controller
             $response = defaultCatchHandler($e);
         }
         return response()->json($response);
+    }
+
+      /**
+     * Llamada al proceso para cargar las parroquias dado un cantón.
+     *
+     * @param string $name
+     *
+     * @return JsonResponse|mixed
+     */
+    public function loadParishes(string $name)
+    {
+        try {
+            return str_replace("\u0022", "\\\\\"", json_encode($this->riskProcess->getParishes($name), JSON_HEX_APOS | JSON_HEX_QUOT));
+        } catch (Throwable $e) {
+            return response()->json(defaultCatchHandler($e));
+        }
     }
   
 }

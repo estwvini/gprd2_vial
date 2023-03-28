@@ -15,7 +15,7 @@ class Document extends Model
     /**
      * @var string
      */
-    protected $table = 'library_document';
+    protected $table = 'sch_lib.library_document';
 
     /**
      * @var bool

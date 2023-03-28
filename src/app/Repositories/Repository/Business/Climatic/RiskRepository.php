@@ -11,7 +11,7 @@ use Exception;
 use DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Business\Roads\MainShape;
+use App\Models\Business\Climatic\Risk;
 use App\Repositories\Repository\Configuration\SettingRepository;
 
 
@@ -48,51 +48,48 @@ class RiskRepository extends Repository
      */
     function model()
     {
-        return MainShape::class;
+        return Risk::class;
     }
 
     /**
-     * Ejecuta consulta de coordenadas 
+     * Obtiene todos los cantones registrados en las vías.
      *
-     * @return mixed
+     * @return Collection
      */
-    public function locale(string $layerId, string $typeId, int $levelId, int $coordX, int $coordY)
-    {   
-        $shape_query =  array();
-        $result = DB::select('SELECT * FROM sch_gis."sp_getclimaticrisk"(:layerId, :typeId, :coordx, :coordy, :levelId, :dpacode) 
-                as feature', ['layerId' =>  $layerId, 'typeId' =>  $typeId, 'coordx' =>  $coordX, 'coordy' =>  $coordY, 'levelId' =>  $levelId, 'dpacode' =>  null]);                                    
-        foreach ($result as $row) {
-            $shape_qry =  [];
-            $fileName1 = $layerId . "-" .  $typeId . "-" .  $row->dpa_r . "." . File::SHAPE_FILE_EXTENSION;
-            Storage::disk('inventory_risks')->put($fileName1, $row->j ); 
-            $shape_qry['name'] =  $fileName1;
-            $shape_qry['path'] =  Storage::disk('inventory_risks')->path('') . $fileName1;                    
-            $shape_qry['dpa_r'] =  $row->dpa_r;
-            $shape_qry['dpa_c'] =  $row->dpa_c;
-            $shape_qry['dpa_p'] =  $row->dpa_p;
-            $shape_qry['dpa_dr'] =  $row->dpa_dr;
-            $shape_qry['dpa_dc'] =  $row->dpa_dc;
-            $shape_qry['dpa_dp'] =  $row->dpa_dp;
-            array_push($shape_query, $shape_qry);
-        }          
-        return $shape_query;
+    public function getCantons(string $dpa_provin)
+    {
+        return $this->model->select('dpa_canton','dpa_descan')
+        ->where('dpa_provin', $dpa_provin)
+        ->groupBy('dpa_canton')
+        ->groupBy('dpa_descan')
+        ->orderBy('dpa_descan')
+        ->get();
     }
 
-       /**
+    /**
+     * Obtener de la BD las parroquias según el cantón.
+     *
+     * @param string $name
+     *
+     * @return Collection
+     */
+    public function findByCanton(string $dpa_canton)
+    {
+        $query = $this->model
+            ->select('dpa_parroq','dpa_despar')
+            ->where('dpa_canton', $dpa_canton)
+            ->orderBy('dpa_despar')
+            ->get();
+        return $query;
+    }
+
+    /**
      * Ejecuta consulta de capas 
      *
      * @return mixed
      */
-    public function execute(string $layerId, string $typeId, int $levelId, int $dpa_r, int $dpa_c, int $dpa_p)
-    {   
-        $dpacode = $dpa_r;
-        if($levelId == 2)
-        {
-            $dpacode = $dpa_c;
-        }else if($levelId == 3)
-        {
-            $dpacode = $dpa_p;
-        }        
+    public function execute(string $layerId, string $typeId, int $levelId, string $dpacode)
+    {  
         $shape_query =  array();
         $fileName = $layerId . "-" .  $typeId . "-" .  $dpacode . "." . File::SHAPE_FILE_EXTENSION;
         if (Storage::disk('inventory_risks')->exists($fileName)) {          
@@ -102,9 +99,8 @@ class RiskRepository extends Repository
             array_push($shape_query, $shape_qry);
             return $shape_query;            
         }
-
-        $result = DB::select('SELECT * FROM sch_gis."sp_getclimaticrisk"(:layerId, :typeId, :coordx, :coordy, :levelId, :dpacode) 
-                as feature', ['layerId' =>  $layerId, 'typeId' =>  $typeId, 'coordx' =>  null, 'coordy' =>  null, 'levelId' =>  $levelId, 'dpacode' =>  $dpacode]);                                    
+        $result = DB::select('SELECT * FROM sch_gis."sp_getclimaticrisk"(:layerId, :typeId, :levelId, :dpacode) 
+                as feature', ['layerId' =>  $layerId, 'typeId' =>  $typeId, 'levelId' =>  $levelId, 'dpacode' =>  $dpacode]);                                    
         foreach ($result as $row) {
             $shape_qry =  [];
             $fileName = $layerId . "-" .  $typeId . "-" .  $dpacode . "." . File::SHAPE_FILE_EXTENSION;

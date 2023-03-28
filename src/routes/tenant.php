@@ -2176,8 +2176,10 @@ Route::middleware([
             'prefix' => 'climatic_risk',
             'middleware' => ['auth', 'route']
         ],
-        function () {            
-            Route::get('climaticrisk/locale', 'Business\Climatic\RiskController@locale')->name('locale.index.vulnerability_climate_risk');
+        function () { 
+            Route::get('climaticrisk/index', 'Business\Climatic\RiskController@index')->name('index.vulnerability_climate_risk');           
+            Route::get('climaticrisk/parish/{name}','Business\Climatic\RiskController@loadParishes')->name('parishes.index.vulnerability_climate_risk');
+            Route::get('climaticrisk/shape_query', 'Business\Climatic\RiskController@shapeQuery')->name('shape_query.index.vulnerability_climate_risk');
             Route::get('climaticrisk/execute', 'Business\Climatic\RiskController@execute')->name('execute.index.vulnerability_climate_risk');
             Route::get('climaticrisk/export', 'Business\Climatic\RiskController@export')->name('export.index.vulnerability_climate_risk');               
         }

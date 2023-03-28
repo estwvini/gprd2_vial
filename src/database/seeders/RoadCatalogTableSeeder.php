@@ -16,9 +16,9 @@ class RoadCatalogTableSeeder extends Seeder
     {
         
 
-        \DB::table('road_catalogo')->delete();
+        \DB::table('road_catalog')->delete();
         
-        \DB::table('road_catalogo')->insert(array (
+        \DB::table('road_catalog')->insert(array (
             0 => 
             array (
                 'id' => 1,

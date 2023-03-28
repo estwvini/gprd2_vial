@@ -210,15 +210,13 @@ class MainShapeRepository extends Repository
         $file_geojson =  public_path('') . '/' . $path_road . $path . $name;                   
         $command = 'ogr2ogr -f PostgreSQL PG:"dbname='. DB::connection()->getDatabaseName() .' host=' .  env('DB_HOST') .
          ' port='. env('DB_PORT') .' user='. env('DB_USERNAME') . ' password='. env('DB_PASSWORD') .'" ' .  $file_geojson . 
-          ' -nln sch_gis.' . $name_without_ext . ' -overwrite';    
-        Log::debug($command);               
+          ' -nln sch_gis.' . $name_without_ext . ' -overwrite';                  
         $process = Process::fromShellCommandline($command);        
         $process->run();
         // executes after the command finishes
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
-        }       
-        Log::debug($process->getOutput());       
+        }           
     }    
 
     /**

@@ -3,10 +3,13 @@
 namespace App\Processes\Business\Climatic;
 
 use App\Repositories\Repository\Business\Climatic\RiskRepository;
+use App\Repositories\Repository\Configuration\SettingRepository;
+use App\Repositories\Repository\Business\Roads\MainShapeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Response;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 
 /**
@@ -20,49 +23,51 @@ class RiskProcess
      */
     protected $riskRepository;
 
+     /**
+     * @var SettingRepository
+     */
+    protected $settingRepository;
+    /**
+     * @var MainShapeRepository
+     */
+    protected $mainShapeRepository;
+
     /**
      * Constructor de RiskProcess.
      *
      * @param RiskRepository $riskRepository
+     * @param SettingRepository $settingRepository
+     * @param MainShapeRepository $mainShapeRepository
      */
     public function __construct(
-        RiskRepository $riskRepository
+        RiskRepository $riskRepository, 
+        SettingRepository $settingRepository,
+        MainShapeRepository $mainShapeRepository,
     ) {
         $this->riskRepository = $riskRepository;
+        $this->mainShapeRepository = $mainShapeRepository;
+        $this->settingRepository = $settingRepository;
     }
 
     /**
-     * ubicar coordenadas.
+     * Retornar data necesaria para mostrar el formulario de riesgos climáticos.
      *
-     * @param Request $request
-     *
-     * @return mixed
-     * @throws Exception
+     * @return array
      */
-    public function locale(array $filters): Response
+    public function indexRisk()
     {
-        $layerId = '';
-        $typeId = '';
-        $levelId = '';
-        $coordX = '';
-        $coordY = '';
-        if (isset($filters['layerId'])) {
-            $layerId = $filters['layerId'];
-        }         
-        if (isset($filters['typeId'])) {
-            $typeId = $filters['typeId'];
-        } 
-        if (isset($filters['levelId'])) {
-            $levelId = intval($filters['levelId']);
-        } 
-        if (isset($filters['coordX'])) {
-            $coordX = intval($filters['coordX']);
-        } 
-        if (isset($filters['coordY'])) {
-            $coordY = intval($filters['coordY']);
-        }   
-        $shape_query = $this->riskRepository->locale($layerId, $typeId,  $levelId,  $coordX,  $coordY);                    
-        return new Response(json_encode($shape_query), 200, ['Content-Type' => 'text/plain']);
+        $gad = $this->settingRepository->findByKey('gad');        
+        $cantons = $this->riskRepository->getCantons($gad->value['code']);
+        $shapes = $this->mainShapeRepository->allShapes();
+        $shapesBackground = $this->mainShapeRepository->shapesBackground();   
+        $codePrv = $gad->value['code'];
+        return [
+            'gad' => $gad->value,
+            'cantons' => $cantons,
+            'shapes' => $shapes,
+            'shapesDefault' => ($shapesBackground) ? [$shapesBackground] : [],
+            'codePrv' => $codePrv
+        ];
     }
 
      /**
@@ -78,9 +83,7 @@ class RiskProcess
         $layerId = '';
         $typeId = '';
         $levelId = '';
-        $dpa_r = '';
-        $dpa_c = '';
-        $dpa_p = '';
+        $dpa = '';
         if (isset($filters['layerId'])) {
             $layerId = $filters['layerId'];
         }         
@@ -90,16 +93,10 @@ class RiskProcess
         if (isset($filters['levelId'])) {
             $levelId = $filters['levelId'];
         } 
-        if (isset($filters['dpa_r'])) {
-            $dpa_r = $filters['dpa_r'];
-        } 
-        if (isset($filters['dpa_c'])) {
-            $dpa_c = $filters['dpa_c'];
-        } 
-        if (isset($filters['dpa_p'])) {
-            $dpa_p = $filters['dpa_p'];
-        }   
-        $shape_query = $this->riskRepository->execute($layerId, $typeId, $levelId, $dpa_r, $dpa_c, $dpa_p);                    
+        if (isset($filters['dpa'])) {
+            $dpa = $filters['dpa'];
+        }
+        $shape_query = $this->riskRepository->execute($layerId, $typeId, $levelId, $dpa);                    
         return new Response(json_encode($shape_query), 200, ['Content-Type' => 'text/plain']);
     }
 
@@ -123,5 +120,36 @@ class RiskProcess
         }
 
         return Storage::disk('inventory_documents')->download($entity->path);
+    }
+
+    /**
+     * Obtener las parroquias de un cantón.
+     *
+     * @param string $name
+     *
+     * @return Collection
+     */
+    public function getParishes(string $name)
+    {
+        return $this->riskRepository->findByCanton($name);
+    }
+
+     /**
+     * Retornar data necesaria para mostrar todos los Shape de la provincia y query
+     *
+     * @return array
+     */
+    public function shapeQuery(array $filters): Response
+    {
+        $shapeId = '';
+        $catId = '';
+        if (isset($filters['shape_id'])) {
+            $shapeId = $filters['shape_id'];
+        }         
+        if (isset($filters['cat_id'])) {
+            $catId = $filters['cat_id'];
+        }   
+        $shape_query = $this->mainShapeRepository->shapeQuery($shapeId,$catId);                    
+        return new Response(json_encode($shape_query), 200, ['Content-Type' => 'text/plain']);
     }
 }

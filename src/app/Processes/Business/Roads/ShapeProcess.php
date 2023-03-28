@@ -104,7 +104,6 @@ class ShapeProcess
      */
     public function store(Request $request)
     {
-        Log::debug("Llego a store");
         $data = $this->shapeRepository->createFromArray($request->all());
         if (!$data[0] && !isset($data[1])) {
             throw new Exception(trans('main_shape.messages.errors.create'), 1000);
